@@ -46,4 +46,23 @@ The app should be created with a random name and can be seen on your [heroku das
 
 # Pushing changes to Git
 Now the workspace is linked with a git repository it will track all the changes you make to its files.
-You prepare the changes to be sent to the repository by making a **commit** 
+Run the following command to select which files will be **staged** (tracked for changes)
+
+```
+git stage *
+```
+
+This will stage all files in the workspace.
+Then You prepare the changes to be sent to the repository by making a **commit**. You must supply a custom commit message when making commits.
+Run the following command
+
+```
+git commit -m "first commit"
+```
+
+Finally you can send your changes to the repository by performing a **push**.
+
+```
+git push -u origin master
+```
+
