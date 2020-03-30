@@ -1,11 +1,10 @@
 FROM gitpod/workspace-full
-                    
-USER gitpod
-
+                
 USER root
-RUN sudo chown -R gitpod:gitpod /home/gitpod/.cache/heroku
+RUN sudo chown -R gitpod:gitpod /home/gitpod/
 RUN sudo apt-get update
 
+USER gitpod
 RUN curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 
 # Install custom tools, runtime, etc. using apt-get
