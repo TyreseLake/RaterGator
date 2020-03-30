@@ -15,6 +15,7 @@ rm - rf .git
 ```
 Now you can initialize a new git workspace by executing the following.
 
+
 ```
 git init
 ```
@@ -65,4 +66,8 @@ Finally you can send your changes to the repository by performing a **push**.
 ```
 git push -u origin master
 ```
+
+Heroku is setup to auto deploy the application for every push to the master branch the github repo. You can view the application by opening it from your [heroku dashboard](https://dashboard.heroku.com/apps/). Click on the newly created app then click on the "Open App" button.
+
+You application should now be deployed on heroku!
 
