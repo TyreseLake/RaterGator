@@ -60,5 +60,20 @@ def logout():
   flash('Logged out successfully.')
   return redirect('/')
 
+@app.route('/signup', methods=['POST'])
+def signup():
+  userdata = request.get_json() # get userdata
+  newuser = User(username=userdata['username'], email=userdata['email'], fname=userdata['fname'], lname=userdata['lname']) # create user object
+  newuser.set_password(userdata['password']) # set password
+  try:#account for errors
+    db.session.add(newuser)
+    db.session.commit() # save user
+  except IntegrityError: # attempted to insert a duplicate user
+    db.session.rollback()
+    flash('Username or email already exists')
+    return 'username or email already exists', 401 # error message
+  flash('User created')
+  return 'user created', 201 # success
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
