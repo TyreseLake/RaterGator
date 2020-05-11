@@ -113,5 +113,15 @@ def add_favorite(instid):
     db.session.commit()
     return "Instructor added to favorites", 201
 
+@app.route('/favorites/<instid>', methods=['DELETE'])
+@login_required
+def delete_favorite(instid):
+    fav = Favorite.query.get((current_user.id, instid))
+    if fav == None:
+        return 'Invalid instructor id or not a favorite', 403
+    db.session.delete(fav)
+    db.session.commit()
+    return "Instructor removed from favorites", 201
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
