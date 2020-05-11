@@ -98,5 +98,55 @@ def get_favorites():
     favs = [fav.toDict() for fav in favs]
     return json.dumps(favs)
 
+@app.route('/favorites', methods=['GET'])
+@login_required
+def get_favorites():
+    favs = Favorite.query.filter_by(userid=current_user.id).all()
+    favs = [fav.toDict() for fav in favs]
+    return json.dumps(favs)
+
+@app.route('/favorites/<instid>', methods=['POST'])
+@login_required
+def add_favorite(instid):
+    data = request.get_json()
+    inst = Instructor.query.get(instid)
+    if inst == None:
+        return 'Invalid instructor id or unauthorized', 403
+    fav = Favorite.query.get((current_user.id, instid))
+    if fav != None:
+        return 'Instructor already a favorite', 403
+    data = Favorite(userid=current_user.id, instructorid=instid)
+    db.session.add(data)
+    db.session.commit()
+    return "Instructor added to favorites", 201
+ 
+@app.route('/favorites/<instid>', methods=['DELETE'])
+@login_required
+def delete_favorite(instid):
+    fav = Favorite.query.get((current_user.id, instid))
+    if fav == None:
+        return 'Invalid instructor id or not a favorite', 403
+    db.session.delete(fav)
+    db.session.commit()
+    return "Instructor removed from favorites", 201
+
+@app.route('/myratings/<instid>', methods=['POST'])
+@login_required
+def add_instructor_rating(instid):
+    inst = Instructor.query.get(instid)
+    if inst == None:
+        flash ('Invalid instructor id or unauthorized')
+        return 'Invalid instructor id or unauthorized', 401
+    rate = Rating.query.get((current_user.id, instid))
+    if rate != None:
+        flash ('Already rated this insructor')
+        return 'Already rated this insructor', 403
+    data = request.get_json()
+    rating = Rating(userid=current_user.id, instructorid=instid, rating1=data["rating1"], rating2=data["rating2"], rating3=data["rating3"], rating4=data["rating4"], rating5=data["rating5"], rating6=data["rating6"], rating7=data["rating7"], rating8=data["rating8"], rating9=data["rating9"], rating10=data["rating10"], rating11=data["rating11"])
+    db.session.add(rating)
+    db.session.commit()
+    flash ('Instructor rated')
+    return "Instructor rated", 201
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
