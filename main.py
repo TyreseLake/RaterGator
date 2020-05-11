@@ -56,24 +56,47 @@ def authentication():
 @app.route('/logout')
 @login_required
 def logout():
-  logout_user()
-  flash('Logged out successfully.')
-  return redirect('/')
+    logout_user()
+    flash('Logged out successfully.')
+    return redirect('/')
 
 @app.route('/signup', methods=['POST'])
 def signup():
-  userdata = request.get_json() # get userdata
-  newuser = User(username=userdata['username'], email=userdata['email'], fname=userdata['fname'], lname=userdata['lname']) # create user object
-  newuser.set_password(userdata['password']) # set password
-  try:#account for errors
-    db.session.add(newuser)
-    db.session.commit() # save user
-  except IntegrityError: # attempted to insert a duplicate user
-    db.session.rollback()
-    flash('Username or email already exists')
-    return 'username or email already exists', 401 # error message
-  flash('User created')
-  return 'user created', 201 # success
+    userdata = request.get_json() # get userdata
+    newuser = User(username=userdata['username'], email=userdata['email'], fname=userdata['fname'], lname=userdata['lname']) # create user object
+    newuser.set_password(userdata['password']) # set password
+    try:#account for errors
+        db.session.add(newuser)
+        db.session.commit() # save user
+    except IntegrityError: # attempted to insert a duplicate user
+        db.session.rollback()
+        flash('Username or email already exists')
+        return 'username or email already exists', 401 # error message
+    flash('User created')
+    return 'user created', 201 # success
+
+app.route('/identify')               #identifies a user if they have a token
+@login_required                       #checks user token
+def protected():
+    return json.dumps(current_user.fname + " " + current_user.lname)
+
+@app.route('/instructors', methods=['GET'])
+def get_inst():
+    instructors = Instructor.query.all()
+    instructors = [instructor.toDict() for instructor in instructors]
+    if current_user.is_authenticated:
+        favs = Favorite.query.filter_by(userid=current_user.id).all()
+        favs = [fav.toDict() for fav in favs]
+    else:
+        favs = None
+    return render_template("instructors.html", instructors = instructors, favorites = favs)
+
+@app.route('/favorites', methods=['GET'])
+@login_required
+def get_favorites():
+    favs = Favorite.query.filter_by(userid=current_user.id).all()
+    favs = [fav.toDict() for fav in favs]
+    return json.dumps(favs)
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
