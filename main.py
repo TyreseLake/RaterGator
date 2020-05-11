@@ -91,6 +91,7 @@ def get_inst():
         favs = None
     return render_template("instructors.html", instructors = instructors, favorites = favs)
 
+
 @app.route('/favorites/<instid>', methods=['POST'])
 @login_required
 def add_favorite(instid):
