@@ -2,11 +2,7 @@
 {% block title %}{{inst.prefix}} {{inst.lname}} Rating{% endblock %}
 {% block head_attrs %}
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/highcharts-more.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/export-data.js"></script>
-<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 {% endblock %}
 {% block body_attrs %} 
   {% if rating is not none %}
@@ -17,108 +13,259 @@
 {{ super() }}
 
 {% block content %}
-  <div>
-    <div class='instructorInfo'>
-      <div class='profile'>
-        <img src="{{ url_for('static', filename='empty.png') }}" alt='instructor image' class = 'profilePicture'>
-        <span>{{inst.prefix}} {{inst.fname}} {{inst.lname}}</span>
+  <div class="container row" style="flex: 1;">
+    
+    <!--Left Section-->
+    <div class="col s12 m4" style="display: flex; flex-direction: column; padding: 0 10px;">
+      <!--Instructor Profile-->
+      <div style="flex: 1;">
+        <div class="card center">
+
+          <div class="card-image">
+            <img src="{{ url_for('static', filename='empty.png') }}" alt='instructor image'>
+            <!--Favorites Button-->
+            {% if current_user.is_authenticated %}
+            <button id="favoriteBtn" class="btn-floating btn-large halfway-fab waves-effect waves-light grey" onclick="addFavs({{ inst.id }}, '#favoriteBtn', '#unfavoriteBtn')" {% if fav is true %}style="display:none;"{% endif %}>
+              <i class="material-icons">favorite_border</i>
+            </button>
+            <button id="unfavoriteBtn" class="btn-floating btn-large halfway-fab waves-effect waves-light red pulse " onclick="removeFavs({{ inst.id }}, '#unfavoriteBtn', '#favoriteBtn')" {% if fav is false %}style="display:none;"{% endif %}>
+              <i class="material-icons">favorite</i>
+            </button>
+            {% endif %}
+          </div>
+
+          <div class="card-content">
+            <span class="card-title">{{inst.prefix}} {{inst.fname}} {{inst.lname}}</span>
+            <ul>
+              <li>{{inst.email}}</li>
+              <li>{{inst.position}}</li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <div class='description'>
-        <ul>
-          <li>{{inst.email}}</li>
-          <li>{{inst.position}}</li>
-        </ul>
-      </div>
-      {% if fav is not none %}
-      <button id="favoriteBtn" class="btn" {% if fav is true %}style="display:none;"{% endif %}>
-        <span>&bigstar;</span>Add to Favorites
-      </button>
-      <button id="unfavoriteBtn" class="btn" {% if fav is false %}style="display:none;"{% endif %}>
-        <span>&bigstar;</span>Remove from Favorites
-      </button>
-      {% endif %}
-    </div>
-      {% if rating is none %}
-      <span class="Message">This teacher has not yet been rated.</span>
-      {% else %}
-      <div style="display: flex; flex-direction: row; padding: 30px;">
+
+      <!--Rate Teacher button and Modal-->
+      <div style="flex: 0; display: flex; flex-direction: column; padding: 0 10px;">
+        {% if current_user.is_authenticated %}
         
-        <div style="padding:10px; margin-right:40px;">
-          <!--Teaching Styles Bar Chart-->
-          <div id="chartBar" class="chart1"></div>
+          {% if myRating is none %}
+            <!--Rate Button-->
+            <button class="btn center modal-trigger ratingBtn" style="margin:10px 0; flex: 1; line-height: 20pt;" data-target="modalBox">Rate Instructor</button>
+            
+            <!--Ratings Modal Box-->
+            <div id="modalBox" class="modal">
+              <div class="modal-content flow-text">
+                <span class="modalClose modal-close">&times;</span>
+                <h1>Rate Instructor</h1>
+                <p>Select your rating for each catagory...</p>
 
-          {% if myRating is not none %}
-            <!--Update Teaching Style-->
-            <button class="btn" onclick="modalShow('#tsmodalBox')">Update Teaching Style</button>
+                <form name="ratingForm">
+                  <h2>Teaching Style</h2>
+                  <p>This section focuses on various aspects of how this instructor teaches.</p>
 
-            <div id="tsmodalBox" class="modal">
-              <div class="modalContent">
-                <span class="modalClose" onclick="modalHide('#tsmodalBox')">&times;</span>
-                <h1>Update Instructor Teaching Style</h1>
-                <p>This section focuses on various aspects of how this instructor teaches.</p>
-
-                <form name = 'teachingForm'>
                   <h3>Presentation</h3>
                   <p>This instructor presents class material in a clear and logical sequence.</p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating1" value="5">Always</label>
-                    <label><input type="radio" name="rating1" value="4">Often</label>
-                    <label><input type="radio" name="rating1" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating1" value="2">Rarely</label>
-                    <label><input type="radio" name="rating1" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="pres5" type="radio" name="rating1" value="5"><label for ='pres5'>Always</label></div>
+                    <div class="col s12 m2"><input id="pres4" type="radio" name="rating1" value="4"> <label for ='pres4'>Often</label></div>
+                    <div class="col s12 m2"><input id="pres3" type="radio" name="rating1" value="3" checked> <label for ='pres3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="pres2" type="radio" name="rating1" value="2"> <label for ='pres2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="pres1" type="radio" name="rating1" value="1"> <label for ='pres1'>Never</label></div>
                   </div>
 
                   <h3>Material Accessibility</h3>
                   <p>This instructor makes course material accessible, intelligible and meaningful.</p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating2" value="5">Always</label>
-                    <label><input type="radio" name="rating2" value="4">Often</label>
-                    <label><input type="radio" name="rating2" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating2" value="2">Rarely</label>
-                    <label><input type="radio" name="rating2" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="mata5" type="radio" name="rating2" value="5"><label for ='mata5'>Always</label></div>
+                    <div class="col s12 m2"><input id="mata4" type="radio" name="rating2" value="4"> <label for ='mata4'>Often</label></div>
+                    <div class="col s12 m2"><input id="mata3" type="radio" name="rating2" value="3" checked> <label for ='mata3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="mata2" type="radio" name="rating2" value="2"> <label for ='mata2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="mata1" type="radio" name="rating2" value="1"> <label for ='mata1'>Never</label></div>
                   </div>
 
                   <h3>Material Coverage</h3>
                   <p>This instructor covers subject matters adequately. </p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating3" value="5">Always</label>
-                    <label><input type="radio" name="rating3" value="4">Often</label>
-                    <label><input type="radio" name="rating3" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating3" value="2">Rarely</label>
-                    <label><input type="radio" name="rating3" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="matc5" type="radio" name="rating3" value="5"><label for ='matc5'>Always</label></div>
+                    <div class="col s12 m2"><input id="matc4" type="radio" name="rating3" value="4"> <label for ='matc4'>Often</label></div>
+                    <div class="col s12 m2"><input id="matc3" type="radio" name="rating3" value="3" checked> <label for ='matc3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="matc2" type="radio" name="rating3" value="2"> <label for ='matc2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="matc1" type="radio" name="rating3" value="1"> <label for ='matc1'>Never</label></div>
                   </div>
 
                   <h3>Pacing</h3>
                   <p>This instructor paces lectures appropriately. </p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating4" value="5">Always</label>
-                    <label><input type="radio" name="rating4" value="4">Often</label>
-                    <label><input type="radio" name="rating4" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating4" value="2">Rarely</label>
-                    <label><input type="radio" name="rating4" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="pac5" type="radio" name="rating4" value="5"><label for ='pac5'>Always</label></div>
+                    <div class="col s12 m2"><input id="pac4" type="radio" name="rating4" value="4"> <label for ='pac4'>Often</label></div>
+                    <div class="col s12 m2"><input id="pac3" type="radio" name="rating4" value="3" checked> <label for ='pac3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="pac2" type="radio" name="rating4" value="2"> <label for ='pac2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="pac1" type="radio" name="rating4" value="1"> <label for ='pac1'>Never</label></div>
                   </div>
 
                   <h3>Conciseness</h3>
                   <p>This instructor is concise in their teaching. </p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating5" value="5">Always</label>
-                    <label><input type="radio" name="rating5" value="4">Often</label>
-                    <label><input type="radio" name="rating5" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating5" value="2">Rarely</label>
-                    <label><input type="radio" name="rating5" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="conc5" type="radio" name="rating5" value="5"><label for ='conc5'>Always</label></div>
+                    <div class="col s12 m2"><input id="conc4" type="radio" name="rating5" value="4"> <label for ='conc4'>Often</label></div>
+                    <div class="col s12 m2"><input id="conc3" type="radio" name="rating5" value="3" checked> <label for ='conc3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="conc2" type="radio" name="rating5" value="2"> <label for ='conc2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="conc1" type="radio" name="rating5" value="1"> <label for ='conc1'>Never</label></div>
                   </div>
 
                   <h3>Practical Demonstration</h3>
                   <p>This instructor illustrates the practical application of the theory presented. </p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating6" value="5">Always</label>
-                    <label><input type="radio" name="rating6" value="4">Often</label>
-                    <label><input type="radio" name="rating6" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating6" value="2">Rarely</label>
-                    <label><input type="radio" name="rating6" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="prac5" type="radio" name="rating6" value="5"><label for ='prac5'>Always</label></div>
+                    <div class="col s12 m2"><input id="prac4" type="radio" name="rating6" value="4"> <label for ='prac4'>Often</label></div>
+                    <div class="col s12 m2"><input id="prac3" type="radio" name="rating6" value="3" checked> <label for ='prac3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="prac2" type="radio" name="rating6" value="2"> <label for ='prac2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="prac1" type="radio" name="rating6" value="1"> <label for ='prac1'>Never</label></div>
+                  </div>
+                  
+                  <h2>Personality</h2>
+                  <p>This section focuses on this instructors personality and behaviour.</p>
+
+                  <h3>Helpful</h3>
+                  <p>This instructor is constructive and helpful in their criticism and when answering questions. </p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="pers5" type="radio" name="rating7" value="5"><label for ='pers5'>Always</label></div>
+                    <div class="col s12 m2"><input id="pers4" type="radio" name="rating7" value="4"> <label for ='pers4'>Often</label></div>
+                    <div class="col s12 m2"><input id="pers3" type="radio" name="rating7" value="3" checked> <label for ='pers3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="pers2" type="radio" name="rating7" value="2"> <label for ='pers2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="pers1" type="radio" name="rating7" value="1"> <label for ='pers1'>Never</label></div>
                   </div>
 
-                  <input type="submit" value="Update Teaching Style">
+                  <h3>Friendly</h3>
+                  <p>This instructor is easy to talk to and ask questions. </p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="fri5" type="radio" name="rating8" value="5"><label for ='fri5'>Always</label></div>
+                    <div class="col s12 m2"><input id="fri4" type="radio" name="rating8" value="4"> <label for ='fri4'>Often</label></div>
+                    <div class="col s12 m2"><input id="fri3" type="radio" name="rating8" value="3" checked> <label for ='fri3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="fri2" type="radio" name="rating8" value="2"> <label for ='fri2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="fri1" type="radio" name="rating8" value="1"> <label for ='fri1'>Never</label></div>
+                  </div>
+
+                  <h3>Interesting</h3>
+                  <p>This instructor generates curiosity and interest about lecture material early in the lecture.</p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="inter5" type="radio" name="rating9" value="5"><label for ='inter5'>Always</label></div>
+                    <div class="col s12 m2"><input id="inter4" type="radio" name="rating9" value="4"> <label for ='inter4'>Often</label></div>
+                    <div class="col s12 m2"><input id="inter3" type="radio" name="rating9" value="3" checked> <label for ='inter3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="inter2" type="radio" name="rating9" value="2"> <label for ='inter2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="inter1" type="radio" name="rating9" value="1"> <label for ='inter1'>Never</label></div>
+                  </div>
+
+                  <h3>Enthusiasm</h3>
+                  <p>This instructor shows enthusiasm for their subject.</p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="enth5" type="radio" name="rating10" value="5"><label for ='enth5'>Always</label></div>
+                    <div class="col s12 m2"><input id="enth4" type="radio" name="rating10" value="4"> <label for ='enth4'>Often</label></div>
+                    <div class="col s12 m2"><input id="enth3" type="radio" name="rating10" value="3" checked> <label for ='enth3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="enth2" type="radio" name="rating10" value="2"> <label for ='enth2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="enth1" type="radio" name="rating10" value="1"> <label for ='enth1'>Never</label></div>
+                  </div>
+
+                  <h3>Expertise</h3>
+                  <p>This instructor demonstrates expert knowledge in their subject. </p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="exper5" type="radio" name="rating11" value="5"><label for ='exper5'>Always</label></div>
+                    <div class="col s12 m2"><input id="exper4" type="radio" name="rating11" value="4"> <label for ='exper4'>Often</label></div>
+                    <div class="col s12 m2"><input id="exper3" type="radio" name="rating11" value="3" checked> <label for ='exper3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="exper2" type="radio" name="rating11" value="2"> <label for ='exper2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="exper1" type="radio" name="rating11" value="1"> <label for ='exper1'>Never</label></div>
+                  </div>
+
+                  <div class="center-align">
+                    <input class="btn ratingBtn" type="submit" value="Submit Rating">
+                  </div>
+                  
+                </form>
+                <br>
+              </div>
+            </div>
+
+            <!--Add Event Listener-->
+            <script>
+              document.forms['ratingForm'].addEventListener('submit', function(ev){rateInstructor(ev, {{inst.id}});});
+            </script>
+
+          {% else %}
+            <!--Update Teaching Style Button-->
+            <button class="btn modal-trigger ratingBtn" style="margin:10px 0;  flex: 1; line-height: 20pt;" data-target="tsmodalBox">Update Teaching Style</button>
+
+            <!--Teaching Style Modal Box-->
+            <div id="tsmodalBox" class="modal">
+              <div class="modal-content flow-text">
+                <span class="modalClose modal-close" onclick="modalHide('#tsmodalBox')">&times;</span>
+                <h1>Update Instructor Teaching Style</h1>
+                <p>This section focuses on various aspects of how this instructor teaches.</p>
+
+                <form name = 'teachingForm'>
+                  
+                  <h3>Presentation</h3>
+                  <p>This instructor presents class material in a clear and logical sequence.</p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="pres5" type="radio" name="rating1" value="5"><label for ='pres5'>Always</label></div>
+                    <div class="col s12 m2"><input id="pres4" type="radio" name="rating1" value="4"> <label for ='pres4'>Often</label></div>
+                    <div class="col s12 m2"><input id="pres3" type="radio" name="rating1" value="3" checked> <label for ='pres3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="pres2" type="radio" name="rating1" value="2"> <label for ='pres2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="pres1" type="radio" name="rating1" value="1"> <label for ='pres1'>Never</label></div>
+                  </div>
+
+                  <h3>Material Accessibility</h3>
+                  <p>This instructor makes course material accessible, intelligible and meaningful.</p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="mata5" type="radio" name="rating2" value="5"><label for ='mata5'>Always</label></div>
+                    <div class="col s12 m2"><input id="mata4" type="radio" name="rating2" value="4"> <label for ='mata4'>Often</label></div>
+                    <div class="col s12 m2"><input id="mata3" type="radio" name="rating2" value="3" checked> <label for ='mata3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="mata2" type="radio" name="rating2" value="2"> <label for ='mata2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="mata1" type="radio" name="rating2" value="1"> <label for ='mata1'>Never</label></div>
+                  </div>
+
+                  <h3>Material Coverage</h3>
+                  <p>This instructor covers subject matters adequately. </p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="matc5" type="radio" name="rating3" value="5"><label for ='matc5'>Always</label></div>
+                    <div class="col s12 m2"><input id="matc4" type="radio" name="rating3" value="4"> <label for ='matc4'>Often</label></div>
+                    <div class="col s12 m2"><input id="matc3" type="radio" name="rating3" value="3" checked> <label for ='matc3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="matc2" type="radio" name="rating3" value="2"> <label for ='matc2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="matc1" type="radio" name="rating3" value="1"> <label for ='matc1'>Never</label></div>
+                  </div>
+
+                  <h3>Pacing</h3>
+                  <p>This instructor paces lectures appropriately. </p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="pac5" type="radio" name="rating4" value="5"><label for ='pac5'>Always</label></div>
+                    <div class="col s12 m2"><input id="pac4" type="radio" name="rating4" value="4"> <label for ='pac4'>Often</label></div>
+                    <div class="col s12 m2"><input id="pac3" type="radio" name="rating4" value="3" checked> <label for ='pac3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="pac2" type="radio" name="rating4" value="2"> <label for ='pac2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="pac1" type="radio" name="rating4" value="1"> <label for ='pac1'>Never</label></div>
+                  </div>
+
+                  <h3>Conciseness</h3>
+                  <p>This instructor is concise in their teaching. </p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="conc5" type="radio" name="rating5" value="5"><label for ='conc5'>Always</label></div>
+                    <div class="col s12 m2"><input id="conc4" type="radio" name="rating5" value="4"> <label for ='conc4'>Often</label></div>
+                    <div class="col s12 m2"><input id="conc3" type="radio" name="rating5" value="3" checked> <label for ='conc3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="conc2" type="radio" name="rating5" value="2"> <label for ='conc2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="conc1" type="radio" name="rating5" value="1"> <label for ='conc1'>Never</label></div>
+                  </div>
+
+                  <h3>Practical Demonstration</h3>
+                  <p>This instructor illustrates the practical application of the theory presented. </p>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="prac5" type="radio" name="rating6" value="5"><label for ='prac5'>Always</label></div>
+                    <div class="col s12 m2"><input id="prac4" type="radio" name="rating6" value="4"> <label for ='prac4'>Often</label></div>
+                    <div class="col s12 m2"><input id="prac3" type="radio" name="rating6" value="3" checked> <label for ='prac3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="prac2" type="radio" name="rating6" value="2"> <label for ='prac2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="prac1" type="radio" name="rating6" value="1"> <label for ='prac1'>Never</label></div>
+                  </div>
+
+                  <div class="center-align">
+                    <input class="btn ratingBtn" type="submit" value="Update Teaching Style">
+                  </div>
                 </form>
                 <br>
               </div>
@@ -128,75 +275,71 @@
                 document.forms['teachingForm'].addEventListener('submit', function(ev){updateTeaching(ev, {{inst.id}});});
               </script>
             </div>
-          {% endif %}
-        </div>
-        
-        <div  style="padding:10px;">
-          <!--Personality Spider Diagram-->
-          <div id="chartSpider" class="chart1"></div>
 
-          {% if myRating is not none %}
-            <!--Update Personality-->
-            <button class="btn" onclick="modalShow('#pmodalBox')">Update Personality</button>
+            <!--Update Personality Button-->
+            <button class="btn modal-trigger ratingBtn" style="margin:10px 0;  flex: 1; line-height: 20pt;" data-target="pmodalBox">Update Personality</button>
 
+            <!--Personality Modal Box-->
             <div id="pmodalBox" class="modal">
-              <div class="modalContent">
-                <span class="modalClose" onclick="modalHide('#pmodalBox')">&times;</span>
+              <div class="modal-content flow-text">
+                <span class="modalClose modal-close" onclick="modalHide('#pmodalBox')">&times;</span>
                 <h1>Update Instructor Personality</h1>
                 <p>This section focuses on this instructors personality and behaviour.</p>
 
                 <form name = 'personalityForm'>
                   <h3>Helpful</h3>
                   <p>This instructor is constructive and helpful in their criticism and when answering questions. </p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating7" value="5">Always</label>
-                    <label><input type="radio" name="rating7" value="4">Often</label>
-                    <label><input type="radio" name="rating7" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating7" value="2">Rarely</label>
-                    <label><input type="radio" name="rating7" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="pers5" type="radio" name="rating7" value="5"><label for ='pers5'>Always</label></div>
+                    <div class="col s12 m2"><input id="pers4" type="radio" name="rating7" value="4"> <label for ='pers4'>Often</label></div>
+                    <div class="col s12 m2"><input id="pers3" type="radio" name="rating7" value="3" checked> <label for ='pers3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="pers2" type="radio" name="rating7" value="2"> <label for ='pers2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="pers1" type="radio" name="rating7" value="1"> <label for ='pers1'>Never</label></div>
                   </div>
 
                   <h3>Friendly</h3>
                   <p>This instructor is easy to talk to and ask questions. </p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating8" value="5">Always</label>
-                    <label><input type="radio" name="rating8" value="4">Often</label>
-                    <label><input type="radio" name="rating8" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating8" value="2">Rarely</label>
-                    <label><input type="radio" name="rating8" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="fri5" type="radio" name="rating8" value="5"><label for ='fri5'>Always</label></div>
+                    <div class="col s12 m2"><input id="fri4" type="radio" name="rating8" value="4"> <label for ='fri4'>Often</label></div>
+                    <div class="col s12 m2"><input id="fri3" type="radio" name="rating8" value="3" checked> <label for ='fri3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="fri2" type="radio" name="rating8" value="2"> <label for ='fri2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="fri1" type="radio" name="rating8" value="1"> <label for ='fri1'>Never</label></div>
                   </div>
 
                   <h3>Interesting</h3>
                   <p>This instructor generates curiosity and interest about lecture material early in the lecture.</p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating9" value="5">Always</label>
-                    <label><input type="radio" name="rating9" value="4">Often</label>
-                    <label><input type="radio" name="rating9" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating9" value="2">Rarely</label>
-                    <label><input type="radio" name="rating9" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="inter5" type="radio" name="rating9" value="5"><label for ='inter5'>Always</label></div>
+                    <div class="col s12 m2"><input id="inter4" type="radio" name="rating9" value="4"> <label for ='inter4'>Often</label></div>
+                    <div class="col s12 m2"><input id="inter3" type="radio" name="rating9" value="3" checked> <label for ='inter3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="inter2" type="radio" name="rating9" value="2"> <label for ='inter2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="inter1" type="radio" name="rating9" value="1"> <label for ='inter1'>Never</label></div>
                   </div>
 
                   <h3>Enthusiasm</h3>
                   <p>This instructor shows enthusiasm for their subject.</p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating10" value="5">Always</label>
-                    <label><input type="radio" name="rating10" value="4">Often</label>
-                    <label><input type="radio" name="rating10" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating10" value="2">Rarely</label>
-                    <label><input type="radio" name="rating10" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="enth5" type="radio" name="rating10" value="5"><label for ='enth5'>Always</label></div>
+                    <div class="col s12 m2"><input id="enth4" type="radio" name="rating10" value="4"> <label for ='enth4'>Often</label></div>
+                    <div class="col s12 m2"><input id="enth3" type="radio" name="rating10" value="3" checked> <label for ='enth3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="enth2" type="radio" name="rating10" value="2"> <label for ='enth2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="enth1" type="radio" name="rating10" value="1"> <label for ='enth1'>Never</label></div>
                   </div>
 
                   <h3>Expertise</h3>
                   <p>This instructor demonstrates expert knowledge in their subject. </p>
-                  <div class="ratingBox">
-                    <label><input type="radio" name="rating11" value="5">Always</label>
-                    <label><input type="radio" name="rating11" value="4">Often</label>
-                    <label><input type="radio" name="rating11" value="3" checked>Somtimes</label>
-                    <label><input type="radio" name="rating11" value="2">Rarely</label>
-                    <label><input type="radio" name="rating11" value="1">Never</label>
+                  <div class="row">
+                    <div class="col s12 offset-m1 m2"><input id="exper5" type="radio" name="rating11" value="5"><label for ='exper5'>Always</label></div>
+                    <div class="col s12 m2"><input id="exper4" type="radio" name="rating11" value="4"> <label for ='exper4'>Often</label></div>
+                    <div class="col s12 m2"><input id="exper3" type="radio" name="rating11" value="3" checked> <label for ='exper3'>Somtimes</label></div>
+                    <div class="col s12 m2"><input id="exper2" type="radio" name="rating11" value="2"> <label for ='exper2'>Rarely</label></div>
+                    <div class="col s12 m2"><input id="exper1" type="radio" name="rating11" value="1"> <label for ='exper1'>Never</label></div>
                   </div>
 
-                  <input type="submit" value="Update Personality">
+                  <div class="center-align">
+                    <input class="btn ratingBtn" type="submit" value="Update Personality">
+                  </div>
                 </form>
                 <br>
               </div>
@@ -206,160 +349,36 @@
                 document.forms['personalityForm'].addEventListener('submit', function(ev){updatePersonality(ev, {{inst.id}});});
               </script>
             </div>
+
+            <!--Remove Rating-->
+            <button class="btn ratingBtn" style="margin:10px 0;  flex: 1; line-height: 20pt;" onclick="deleteRating({{inst.id}})">Remove My Rating</button>
           {% endif %}
-        </div>
-       
-        
-      </div>
-        {% if myRating is not none %}
-          <!--Remove Rating-->
-          <button class="btn" onclick="deleteRating({{inst.id}})">Remove My Rating</button>
+
+        {% else %}
+
+        Log in to rate this Instructor.
+
         {% endif %}
-
-      {% endif %}
-    
-
-    <div>
-      {% if current_user.is_authenticated %}
-      
-      {% if myRating is none %}
-      <button id="rateBtn" class="btn" onclick="modalShow('#modalBox')">Rate Instructor</button>
-
-      <div id="modalBox" class="modal">
-        <div class="modalContent">
-          <span class="modalClose" onclick="modalHide('#modalBox')">&times;</span>
-          <h1>Rate Instructor</h1>
-          <p>Select your rating for each catagory...</p>
-          <form name="ratingForm">
-            <h2>Teaching Style</h2>
-            <p>This section focuses on various aspects of how this instructor teaches.</p>
-
-            <h3>Presentation</h3>
-            <p>This instructor presents class material in a clear and logical sequence.</p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating1" value="5">Always</label>
-              <label><input type="radio" name="rating1" value="4">Often</label>
-              <label><input type="radio" name="rating1" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating1" value="2">Rarely</label>
-              <label><input type="radio" name="rating1" value="1">Never</label>
-            </div>
-
-            <h3>Material Accessibility</h3>
-            <p>This instructor makes course material accessible, intelligible and meaningful.</p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating2" value="5">Always</label>
-              <label><input type="radio" name="rating2" value="4">Often</label>
-              <label><input type="radio" name="rating2" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating2" value="2">Rarely</label>
-              <label><input type="radio" name="rating2" value="1">Never</label>
-            </div>
-
-            <h3>Material Coverage</h3>
-            <p>This instructor covers subject matters adequately. </p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating3" value="5">Always</label>
-              <label><input type="radio" name="rating3" value="4">Often</label>
-              <label><input type="radio" name="rating3" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating3" value="2">Rarely</label>
-              <label><input type="radio" name="rating3" value="1">Never</label>
-            </div>
-
-            <h3>Pacing</h3>
-            <p>This instructor paces lectures appropriately. </p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating4" value="5">Always</label>
-              <label><input type="radio" name="rating4" value="4">Often</label>
-              <label><input type="radio" name="rating4" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating4" value="2">Rarely</label>
-              <label><input type="radio" name="rating4" value="1">Never</label>
-            </div>
-
-            <h3>Conciseness</h3>
-            <p>This instructor is concise in their teaching. </p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating5" value="5">Always</label>
-              <label><input type="radio" name="rating5" value="4">Often</label>
-              <label><input type="radio" name="rating5" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating5" value="2">Rarely</label>
-              <label><input type="radio" name="rating5" value="1">Never</label>
-            </div>
-
-            <h3>Practical Demonstration</h3>
-            <p>This instructor illustrates the practical application of the theory presented. </p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating6" value="5">Always</label>
-              <label><input type="radio" name="rating6" value="4">Often</label>
-              <label><input type="radio" name="rating6" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating6" value="2">Rarely</label>
-              <label><input type="radio" name="rating6" value="1">Never</label>
-            </div>
-            
-            <h2>Personality</h2>
-            <p>This section focuses on this instructors personality and behaviour.</p>
-
-            <h3>Helpful</h3>
-            <p>This instructor is constructive and helpful in their criticism and when answering questions. </p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating7" value="5">Always</label>
-              <label><input type="radio" name="rating7" value="4">Often</label>
-              <label><input type="radio" name="rating7" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating7" value="2">Rarely</label>
-              <label><input type="radio" name="rating7" value="1">Never</label>
-            </div>
-
-            <h3>Friendly</h3>
-            <p>This instructor is easy to talk to and ask questions. </p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating8" value="5">Always</label>
-              <label><input type="radio" name="rating8" value="4">Often</label>
-              <label><input type="radio" name="rating8" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating8" value="2">Rarely</label>
-              <label><input type="radio" name="rating8" value="1">Never</label>
-            </div>
-
-            <h3>Interesting</h3>
-            <p>This instructor generates curiosity and interest about lecture material early in the lecture.</p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating9" value="5">Always</label>
-              <label><input type="radio" name="rating9" value="4">Often</label>
-              <label><input type="radio" name="rating9" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating9" value="2">Rarely</label>
-              <label><input type="radio" name="rating9" value="1">Never</label>
-            </div>
-
-            <h3>Enthusiasm</h3>
-            <p>This instructor shows enthusiasm for their subject.</p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating10" value="5">Always</label>
-              <label><input type="radio" name="rating10" value="4">Often</label>
-              <label><input type="radio" name="rating10" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating10" value="2">Rarely</label>
-              <label><input type="radio" name="rating10" value="1">Never</label>
-            </div>
-
-            <h3>Expertise</h3>
-            <p>This instructor demonstrates expert knowledge in their subject. </p>
-            <div class="ratingBox">
-              <label><input type="radio" name="rating11" value="5">Always</label>
-              <label><input type="radio" name="rating11" value="4">Often</label>
-              <label><input type="radio" name="rating11" value="3" checked>Somtimes</label>
-              <label><input type="radio" name="rating11" value="2">Rarely</label>
-              <label><input type="radio" name="rating11" value="1">Never</label>
-            </div>
-
-            <input type="submit" value="Submit Rating">
-          </form>
-          <br>
-        </div>
       </div>
-      <script>
-        document.forms['ratingForm'].addEventListener('submit', function(ev){rateInstructor(ev, {{inst.id}});});
-      </script>
-      {% endif %}
-
+    </div>
+    
+    <!--Right Section-->
+    <div class="col s12 m8" style="display: flex; flex-direction: column; padding: 0 10px;">
+      <!--Instructor Ratings Display-->
+      {% if rating is none %}
+        <span class="Message">This teacher has not yet been rated.</span>
       {% else %}
-      Log in to rate this Instructor.
+        <div class="card" style="flex:1;">
+          <!--Teaching Styles Bar Chart-->
+          <div id="chartBar"></div>
+        </div>
+          
+        <div  class="card" style="flex:1;">
+          <!--Personality Spider Diagram-->
+          <div id="chartSpider"></div>
+        </div>
       {% endif %}
     </div>
+    
   </div>
 {% endblock %}

@@ -3,32 +3,72 @@
 {{ super() }}
 
 {% block content %}
-   <div class="loginBox">
-    <div class="tab">
+<div style="width: 100%; margin: 30px 0 0">
+  <div style="max-width: 600px; width: 100%; margin:auto;">
+      <div class="col" style="width: 100%;">
+        <ul class="row tabs">
+          <li class="tab col s6"><a id="loginTab" onclick="openTab(event, 'login')">Login</a></li>
+          <li class="tab col s6"><a id="signupTab" onclick="openTab(event, 'signup')">Sign Up</a></li>
+        </ul>
+      </div>
+      <!--
       <button id="loginTab" class="tablinks" onclick="openTab(event, 'login')">Login</button>
       <button id="signupTab" class="tablinks" onclick="openTab(event, 'signup')">Sign Up</button>
-    </div>
+      -->
     
     <div id="login" class="tabcontent">
-      <form name="loginForm">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="submit" value="Login">
+      <form class="row" name="loginForm">
+          <div class="input-field col s12">
+            <input id="username" class="validate" type="text" name="username" required>
+            <label for="username">Username</label>
+          </div>
+          
+          <div class="input-field col s12">
+            <input id="password" class="validate" type="password" name="password" required>
+            <label for="password">Password</label>
+          </div>
+          <div class="center-align">
+            <input class="btn ratingBtn" type="submit" value="Login">
+          </div>
       </form>
     </div>
     
     <div id="signup" class="tabcontent">
-      <form name="signupForm">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="email" name="email" placeholder="E-Mail" required>
-        <input type="text" name="fname" placeholder="First Name" required>
-        <input type="text" name="lname" placeholder="Last Name" required>
-        <input type="submit" value="Sign Up">
+      <form class="row" name="signupForm">
+
+        <div class="input-field col s12 m6">
+          <input id="fname" class="validate" type="text" name="fname" required>
+          <label for="fname">First Name</label>
+        </div>
+
+        <div class="input-field col s12 m6">
+          <input id="lname" class="validate" type="text" name="lname" required>
+          <label for="lname">Last Name</label>
+        </div>
+
+        <div class="input-field col s12">
+          <input id="id" class="validate" type="email" name="email" required>
+          <label for="email">E-Mail</label>
+        </div>
+
+        <div class="input-field col s12">
+          <input id="s-username" class="validate" type="text" name="username" required>
+          <label for="s-username">Username</label>
+        </div>
+        
+        <div class="input-field col s12">
+          <input id="s-password" class="validate" type="password" name="password" required>
+          <label for="s-password">Password</label>
+        </div>
+
+        <div class="center-align">
+          <input class="btn ratingBtn" type="submit" value="Sign Up">
+        </div>
       </form>
     </div>
   </div>
-  {% if signup %}
+</div>
+{% if signup %}
   <script>
     document.querySelector('#signupTab').click();
   </script>

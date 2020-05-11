@@ -4,8 +4,14 @@
 {{ super() }}
 
 {% block content %}
-  <div>
-    <h1>Rate My Senpai</h1>
-    <a href="/instructors">Go To Instructors</a>
+<div style="flex: 1;"></div>
+<div style="flex: 3; z-index: 1;">
+  <div class="homeContainer z-depth-3 home-img" style="background-image: url('{{ url_for('static', filename='raterGator.jpg') }}');">
+    <div class="homeTextContainer center">
+      <h1>Rater Gator</h1>
+      <h2>The Teacher Rating Website</h2>
+      <a class="btn homeButton" href="/instructors">View Instructors</a>
+    </div>
   </div>
+</div>
 {% endblock %}

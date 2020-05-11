@@ -3,28 +3,47 @@
 
 {{ super() }}
 
+
 {% block content %}
+<div class="container" style="flex: 1">
   {% if current_user.is_authenticated %}
-    <label>
-      <input type="checkbox" id="favCheckBox" onclick="checkFavorites( {{favorites}} , {{instructors|length}} )"/>
-      Favorites
-    </label>
-  {% endif %}
 
-  {% for inst in instructors %}
-    <div id="inst{{inst.id}}" class='boxInst'>
-      <div class='profile'>
-        <img src="{{ url_for('static', filename='empty.png') }}" alt='instructor image' class = 'profilePicture'>
-        <span>{{inst.prefix}} {{inst.fname}} {{inst.lname}}</span>
-      </div>
-      <div class='description'>
-        <ul>
-          <li>{{inst.email}}</li>
-          <li>{{inst.position}}</li>
-        </ul>
-        <a href='/ratings/{{inst.id}}'>View Rating</a>
-      </div>
+  <div class="switchBox z-depth-3">
+    <div class="switch center-align">
+      <label>
+        <span class="flow-text black-text" style="vertical-align: middle">My Favorites</span>
+        <input id="favCheckBox" type="checkbox" onclick="checkFavorites( {{favorites}}, {{instructors}} )" />
+        <span class="lever  green accent-3 z-depth-3"></span>
+      </label>
     </div>
-  {% endfor %}
+  </div>
 
+  {% endif %}
+  
+  <div class="valign-wrapper" style="display: flex; flex-direction: row; flex-wrap:wrap; align-items: stretch; justify-content: flex-start;  padding-bottom: 25px;">
+    {% for inst in instructors %}
+      <div id="inst{{inst.id}}" style="width: 25%; min-width: 250px; padding: 10px; margin: 0 auto;">
+        <div class="card z-depth-3 hoverable" style="height: 100%; display: flex; flex-direction: column;">
+          <div class='card-image center' style="flex: 0;">
+            <img src="{{ url_for('static', filename='empty.png') }}" alt='instructor image' class = 'profilePicture' style="height: 100%;">
+          </div>
+
+          <div class='card-content' style="flex: 1;">
+            <span class="card-title">{{inst.prefix}} {{inst.fname}} {{inst.lname}}</span>
+            
+            <ul>
+              <li>{{inst.email}}</li>
+              <li>{{inst.position}}</li>
+            </ul>
+          </div>
+
+          <div class="card-action" style="flex: 0;">
+            <a class="green-text text-accent-3" href='/ratings/{{inst.id}}'>View Rating</a>
+          </div>
+
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

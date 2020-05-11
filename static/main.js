@@ -1,4 +1,19 @@
-const server = "https://safe-shore-44211.herokuapp.com";
+const server = "http://localhost:8080";
+
+document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.modal');
+  var instances = M.Modal.init(elems);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.querySelectorAll('.tabs');
+  var instance = M.Tabs.init(el);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.sidenav');
+  var instances = M.Sidenav.init(elems);
+});
 
 async function login(event){
   event.preventDefault();
@@ -120,10 +135,32 @@ async function deleteRating(instid){
   choice = confirm("Are you sure you want to remove your rating for this instructor?");
   if (choice){
     url = server + "/myratings/" + instid;
-    await deleteData(url);
+    result = await deleteData(url);
     url = server + "/ratings/" + instid;
     window.location.href = url;
   }
+}
+
+//Add to Favorites
+async function addFavs(instid, btn1, btn2){
+  url = server + "/favorites/" + instid;
+  result = await postDataNoBody(url);
+  if (result){
+    M.toast({html: 'Added to favorites', classes:'z-depth-3 toastStyle'});
+    document.querySelector(btn1).style.display="none";
+    document.querySelector(btn2).style.display="";
+  }
+}
+
+//Remove from Favorites
+async function removeFavs(instid, btn1, btn2){
+  url = server + "/favorites/" + instid;
+  result = await deleteData(url);
+  if (result){
+    M.toast({html: 'Removed from favorites', classes:'z-depth-3 toastStyle'});
+    document.querySelector(btn1).style.display="none";
+    document.querySelector(btn2).style.display="";
+  }  
 }
 
 async function postData(url, data){
@@ -136,7 +173,23 @@ async function postData(url, data){
         headers: {'Content-Type' : 'application/json'}
       },
     );
-    console.log(response)
+    //console.log(response)
+    return response.ok;
+  }catch(error){
+    console.log(error);
+    return false;
+  }
+}
+
+async function postDataNoBody(url){
+  try{
+    let response = await fetch(
+      url,
+      {
+        method: 'POST'
+      },
+    );
+    //console.log(response)
     return response.ok;
   }catch(error){
     console.log(error);
@@ -154,7 +207,7 @@ async function putData(url, data){
         headers: {'Content-Type' : 'application/json'}
       },
     );
-    console.log(response);
+    //console.log(response);
   }catch(error){
     console.log(error);
   }
@@ -168,130 +221,117 @@ async function deleteData(url){
         method: 'DELETE'
       },
     );
-    console.log(response);
+    //console.log(response);
+    return response.ok;  
   }catch(error){
     console.log(error);
+    return false;
   }
 }
-
-/*
-async function getData(url){
-  try{
-    let response = await fetch(url);
-    let result = await response.json(); //.text()
-    
-    console.log(result); //do somthing
-  }catch(error){
-    console.log(error);
-  }
-}*/
 
 function initCharts(rating){
   data = [rating.rating1, rating.rating2, rating.rating3, rating.rating4, rating.rating5, rating.rating6];
-  drawChart(data);
-  data = [rating.rating7, rating.rating8, rating.rating9, rating.rating10, rating.rating11]
-  drawFigure(data);
-}
-
-function drawChart(data){
-  var myChart = Highcharts.chart('chartBar', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: 'Instructor Teaching Skill Rating Summary'
-    },
-    xAxis: {
-        categories: ['Presentation', 'Material Accessability', 'Material Coverage', 'Pacing', 'Conciseness', 'Practical Demonstation']
-    },
-    yAxis: {
-        title: {
-            text: 'Teaching Style'
-        },
-        max: 5,
-        min: 0,
-        tickInterval: 1
-    },
-    legend: {
-      enabled: false
-    },
-    series: [{
-        name: 'Rating Score',
-        data: data
-    }],
+  data = data.map(function(x){
+    return Math.round(x * 10) / 10;
   });
+  //drawChart(data);
+  drawColumnChart(data);
+  data = [rating.rating7, rating.rating8, rating.rating9, rating.rating10, rating.rating11]
+  data = data.map(function(x){
+    return Math.round(x * 10) / 10;
+  });
+  drawSpiderFigure(data);
+  //drawFigure(data);
 }
 
-function drawFigure(data){
-  Highcharts.chart('chartSpider', {
-
+function drawColumnChart(data){
+  var options = {
     chart: {
-      polar: true,
-      type: 'line',
+      type: 'bar',
+      height: '280px'
     },
-
-      title: {
-      text: 'Instructor Personality Rating Summary'
-    },
-
-    pane: {
-      size: '100%'
-    },
-
-    xAxis: {
-      categories: ['Helpful', 'Friendly', 'Interesting', 'Enthusiasm',
-        'Expertise'],
-      tickmarkPlacement: 'on',
-      lineWidth: 0
-    },
-
-    yAxis: {
-      gridLineInterpolation: 'polygon',
-      lineWidth: 0,
-      max: 6,
-      min: 0,
-      tickInterval: 1
-    },
-
-    tooltip: {
-      split: false,
-      pointFormat: '<span style="color:{series.color}">{point.y}</span>'
-    },
-
-    legend: {
-      enabled: false
-      /*
-      align: 'right',
-      verticalAlign: 'middle',
-      layout: 'vertical'*/
-    },
-
     series: [{
-      name: 'Rating Score',
-      data: [data[0], data[1], data[2], data[3], data[4]],
-      pointPlacement: 'on'
+      name: 'Teaching Style',
+      data: data
     }],
+    xaxis: {
+      categories: ['Presentation', 'Material Accessability', 'Material Coverage', 'Pacing', 'Conciseness', 'Practical Demonstation']
+    },
+    yaxis: {
+      tickAmount: 5,
+      min: 0,
+      max: 5,
+    },
+    legend: {
+      show: false
+    },
+    colors: ['#1e5631', '#a4de02', '#76ba1b', '#4c9a2a', '#acdf87', '#68bb59'],
+    plotOptions: {
+        bar: {
+            horizontal: true,
+            distributed: true,
+            barHeight: '100%'
+          }
+    }
+  }
+  
+  var chart = new ApexCharts(document.querySelector("#chartBar"), options);
+  
+  chart.render();
+}
 
-    responsive: {
-      rules: [{
-        condition: {
-          maxWidth: 500
-        },
-        chartOptions: {
-          legend: {
-            align: 'center',
-            verticalAlign: 'bottom',
-            layout: 'horizontal'
-          },
-          pane: {
-            size: '70%'
+function drawSpiderFigure(data){
+  var options = {
+    chart: {
+      type: 'radar',
+      height: '280px',
+      offsetY: 20,
+      offsetX: 12
+    },
+    series: [
+      {
+        name: "Personality",
+        data: data
+      }
+    ],
+    labels: ['Helpful', 'Friendly', 'Interesting', 'Enthusiasm', 'Expertise'],
+    yaxis: {
+      tickAmount: 5,
+      min: 0,
+      max: 5,
+    },
+    markers: {
+      size: 5,
+      hover: {
+        size: 10
+      }
+    },
+    colors: ['#00e676'],
+    dataLabels: {
+      enabled: true,
+      distributed: true,
+      background: {
+        enabled: true,
+        borderRadius:2,
+      }
+    },
+    plotOptions: {
+      radar: {
+        polygons: {
+          strokeColor: '#e8e8e8',
+          fill: {
+              colors: ['#f8f8f8', '#fff']
           }
         }
-      }]
+      }
     }
+  }
 
-  });
+  var chart = new ApexCharts(document.querySelector("#chartSpider"), options);
+  
+  chart.render();
 }
+
 
 //modal show
 function modalShow(modalId){
@@ -313,25 +353,27 @@ window.onclick = function(event) {
 }
 
 //favorites
-function checkFavorites(favorites, count){
+function checkFavorites(favorites, instructors){
   fav = document.querySelector('#favCheckBox');
   if (fav.checked == true){
-    for (num = 1; num<=count; num++){
-      console.log(`#inst${num}`);
-      document.querySelector(`#inst${num}`).style.display = "none";
+    for (instructor in instructors){
+      instructor = JSON.stringify(instructors[instructor]);
+      instructor = JSON.parse(instructor);
+      document.querySelector(`#inst${instructor['id']}`).style.display = "none";
     }
     for (favorite in favorites){
       favorite = JSON.stringify(favorites[favorite]);
       favorite = JSON.parse(favorite);
-      console.log(favorite["instructorid"]);
+      //console.log(favorite["instructorid"]);
       document.querySelector(`#inst${favorite["instructorid"]}`).style.display = "";
     }
   }else{
-    for (num = 1; num<=count; num++){
-      document.querySelector(`#inst${num}`).style.display = "";
+    for (instructor in instructors){
+      instructor = JSON.stringify(instructors[instructor]);
+      instructor = JSON.parse(instructor);
+      document.querySelector(`#inst${instructor['id']}`).style.display = "";
     }
   }
-  
 }
 
 //Tabs

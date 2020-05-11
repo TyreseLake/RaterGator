@@ -1,38 +1,80 @@
 <!doctype html>
 <html>
   <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Annie Use Your Telescope' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Chilanka' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Courgette' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}{% endblock %}</title>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
     {% block head_attrs %}{% endblock %}
   </head>
- <body {% block body_attrs %}{% endblock %}>
-    <nav class='navBar'>
-      <ul>
-        <li class='home'><a href="#">Home</a></li>
-        {% if current_user.is_authenticated %}
-          <li><a href="/logout">Log Out</a></li>
-          <li><div class='user'>Welcome {{ current_user.fname }} {{ current_user.lname }}!</div></li>
-        {% else %}
-          <li><a href="#">Sign Up</a></li>
-          <li><a href="/login">Login</a></li>
+
+  <body {% block body_attrs %}{% endblock %}>
+    <div class="bodyContent home-img" style="background-image: url('{{ url_for('static', filename='greenWhiteBG.png') }}'); display:flex; flex-direction: column; min-height: 100vh;">
+      <!--Navigation Bar Full-->
+      <nav class="black hide-on-small-only" style="flex: 0; z-index: 2;">
+        <div class="nav-wrapper z-depth-3">
+          <a class='brand-logo left' href="/"><img src="{{ url_for('static', filename='ratorGator.png') }}" style="height: 65px; width: auto; margin: 0 10px;"/></a>
+          <ul class="right">
+            {% if current_user.is_authenticated %}
+              <li><div style="margin-right: 5px;">Logged in as {{ current_user.fname }} {{ current_user.lname }}!</div></li>
+              <li><a href="/instructors" class="waves-effect waves-light navButton"><i class="material-icons left">group</i>Instructors</a></li>
+              <li><a href="/logout" class="waves-effect waves-light navButton"><i class="material-icons left">close</i>Log Out</a></li>
+            {% else %}
+              <li><a href="/instructors" class="waves-effect waves-light navButton"><i class="material-icons left">group</i>Instructors</a></li>
+              <li><a href="/login" class="waves-effect waves-light navButton"><i class="material-icons left">input</i>Login</a></li>
+              <li><a href="/login?signup" class="waves-effect waves-light navButton"><i class="material-icons left">mode_edit</i>Sign Up</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
+
+      <nav class="nav-extended black hide-on-med-and-up">
+        <div class="nav-wrapper z-depth-3">
+          {% if current_user.is_authenticated %}
+            <div class="row">
+              <a class='left brand-logo' href="/"><img src="{{ url_for('static', filename='ratorGator.png') }}" style="height: 65px; width: auto; margin: 0 10px;"/></a>
+              <span style="margin: auto 0 auto 50%">Logged in as {{ current_user.fname }} {{ current_user.lname }}!</span>
+            </div>
+          {% else %} 
+            <a class='brand-logo' href="/"><img src="{{ url_for('static', filename='ratorGator.png') }}" style="height: 65px; width: auto; margin: 0 10px;"/></a>
+          {% endif %}
+        </div>
+        <div class="nav-wrapper">
+          <ul class="right">
+              <li><a href="/instructors" class="waves-effect waves-light navButton"><i class="material-icons left">group</i>View</a></li>
+            {% if current_user.is_authenticated %}
+              <li><a href="/logout" class="waves-effect waves-light navButton"><i class="material-icons left">close</i>Log Out</a></li>
+            {% else %}
+              <li><a href="/login" class="waves-effect waves-light navButton"><i class="material-icons left">input</i>Login</a></li>
+              <li><a href="/login?signup" class="waves-effect waves-light navButton"><i class="material-icons left">mode_edit</i>Sign Up</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
+
+
+
+      <!--Get messages in flashed messages and display a pop up if there are any-->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <script>
+              M.toast({html: '{{ message }}', classes:'z-depth-3 toastStyle'});
+            </script>
+          {% endfor %}
         {% endif %}
-      </ul>
-    </nav>
+      {% endwith %}
 
-    {% with messages = get_flashed_messages() %}<!--Get messages in flashed messages and display it if there are any-->
-      {% if messages %}
-      <div class="flashedMessage">
-        <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
+      <!--Page Content-->
+      <div style="display: flex; flex-direction: column; flex: 1;">
+        {% block content %}{% endblock %}
       </div>
-      {% endif %}
-    {% endwith %}
-
-    <div id="content">{% block content %}{% endblock %}</div>
+    </div>
   </body>
 </html>
