@@ -32,14 +32,26 @@ app.app_context().push()
 
 @app.route('/')
 def index():
-  return render_template('index.html')
+    return render_template('index.html')
 
 @app.route('/login')
 def login():
-  signup = request.args.get('signup')
-  if signup is not None:
-    return render_template('login.html', signup = True)
-  return  render_template('login.html', signup = False)
+    signup = request.args.get('signup')
+    if signup is not None:
+        return render_template('login.html', signup = True)
+    return  render_template('login.html', signup = False)
+
+@app.route('/auth', methods=['POST'])
+def authentication():
+    data = request.get_json()
+    user = User.query.filter_by(username = data['username']).first()
+    if user and user.check_password(data['password']): # check credentials
+        flash('Logged in successfully.') # send message to next page
+        login_user(user) # login the user
+        return "Logged in successfully", 200 # redirect to main page if login successful
+    else:
+        flash('Invalid username or password') # send message to next page
+        return "Invalid username or password", 403
 
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
