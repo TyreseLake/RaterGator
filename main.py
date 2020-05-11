@@ -29,7 +29,7 @@ def index():
 def client_app():
   return app.send_static_file('app.html')
 
-  @app.route('/data', methods=['GET'])
+@app.route('/data', methods=['GET'])
 def getData():
   token = request.args.get('token')
   res = 'Hello token='+token if token else "Hello"
