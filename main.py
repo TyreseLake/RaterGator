@@ -34,5 +34,12 @@ app.app_context().push()
 def index():
   return render_template('index.html')
 
+@app.route('/login')
+def login():
+  signup = request.args.get('signup')
+  if signup is not None:
+    return render_template('login.html', signup = True)
+  return  render_template('login.html', signup = False)
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
