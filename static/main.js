@@ -1,4 +1,4 @@
-const server = "http://localhost:8080";
+const server = "https://safe-shore-44211.herokuapp.com";
 
 document.addEventListener('DOMContentLoaded', function() {
   var elems = document.querySelectorAll('.modal');
