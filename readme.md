@@ -1,4 +1,5 @@
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/uwidcit/info2602ps.git) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)]
+(https://gitpod.io/#https://github.com/FadedHearts/info2602ps.git) 
 
 # Before you start
 Create a heroku account by following this [link](https://signup.heroku.com/login)
