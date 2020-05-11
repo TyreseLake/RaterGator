@@ -98,5 +98,37 @@ def get_favorites():
     favs = [fav.toDict() for fav in favs]
     return json.dumps(favs)
 
+@app.route('/favorites', methods=['GET'])
+@login_required
+def get_favorites():
+    favs = Favorite.query.filter_by(userid=current_user.id).all()
+    favs = [fav.toDict() for fav in favs]
+    return json.dumps(favs)
+
+@app.route('/favorites/<instid>', methods=['POST'])
+@login_required
+def add_favorite(instid):
+    data = request.get_json()
+    inst = Instructor.query.get(instid)
+    if inst == None:
+        return 'Invalid instructor id or unauthorized', 403
+    fav = Favorite.query.get((current_user.id, instid))
+    if fav != None:
+        return 'Instructor already a favorite', 403
+    data = Favorite(userid=current_user.id, instructorid=instid)
+    db.session.add(data)
+    db.session.commit()
+    return "Instructor added to favorites", 201
+ 
+@app.route('/favorites/<instid>', methods=['DELETE'])
+@login_required
+def delete_favorite(instid):
+    fav = Favorite.query.get((current_user.id, instid))
+    if fav == None:
+        return 'Invalid instructor id or not a favorite', 403
+    db.session.delete(fav)
+    db.session.commit()
+    return "Instructor removed from favorites", 201
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
