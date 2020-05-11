@@ -2,25 +2,38 @@
 <html>
   <head>
   
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-     <!--Import Google Icon Font-->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <!--Let browser know website is optimized for mobile-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}{% endblock %}</title>
-
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    {% block head_attrs %}{% endblock %}
   </head>
-  <body>
-    <nav class="purple">
-      <div class="nav-wrapper">
-        <a href="#!" class="brand-logo center">{% block page %}{% endblock %}</a>
-      </div>
+ <body {% block body_attrs %}{% endblock %}>
+    <nav class='navBar'>
+      <ul>
+        <li class='home'><a href="#">Home</a></li>
+        {% if current_user.is_authenticated %}
+          <li><a href="/logout">Log Out</a></li>
+          <li><div class='user'>Welcome {{ current_user.fname }} {{ current_user.lname }}!</div></li>
+        {% else %}
+          <li><a href="#">Sign Up</a></li>
+          <li><a href="/login">Login</a></li>
+        {% endif %}
+      </ul>
     </nav>
 
-    <div id="content">{% block content %}{% endblock %}</div>
+    {% with messages = get_flashed_messages() %}<!--Get messages in flashed messages and display it if there are any-->
+      {% if messages %}
+      <div class="flashedMessage">
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    {% endwith %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <div id="content">{% block content %}{% endblock %}</div>
   </body>
 </html>

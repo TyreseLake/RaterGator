@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Instructor Listing{% endblock %}
+
+{{ super() }}
+
+{% block content %}
+  {% if current_user.is_authenticated %}
+    <label>
+      <input type="checkbox" id="favCheckBox" onclick="checkFavorites( {{favorites}} , {{instructors|length}} )"/>
+      Favorites
+    </label>
+  {% endif %}
+
+  {% for inst in instructors %}
+    <div id="inst{{inst.id}}" class='boxInst'>
+      <div class='profile'>
+        <img src="{{ url_for('static', filename='empty.png') }}" alt='instructor image' class = 'profilePicture'>
+        <span>{{inst.prefix}} {{inst.fname}} {{inst.lname}}</span>
+      </div>
+      <div class='description'>
+        <ul>
+          <li>{{inst.email}}</li>
+          <li>{{inst.position}}</li>
+        </ul>
+        <a href='/ratings/{{inst.id}}'>View Rating</a>
+      </div>
+    </div>
+  {% endfor %}
+
+{% endblock %}
