@@ -75,7 +75,7 @@ def signup():
     flash('User created')
     return 'user created', 201 # success
 
-app.route('/identify')               #identifies a user if they have a token
+app.route('/identify', methods=['GET'])            #identifies a user if they have a token
 @login_required                       #checks user token
 def protected():
     return json.dumps(current_user.fname + " " + current_user.lname)
