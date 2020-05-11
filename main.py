@@ -123,5 +123,149 @@ def delete_favorite(instid):
     db.session.commit()
     return "Instructor removed from favorites", 201
 
+@app.route('/myratings/<instid>', methods=['POST'])
+@login_required
+def add_instructor_rating(instid):
+    inst = Instructor.query.get(instid)
+    if inst == None:
+        flash ('Invalid instructor id or unauthorized')
+        return 'Invalid instructor id or unauthorized', 401
+    rate = Rating.query.get((current_user.id, instid))
+    if rate != None:
+        flash ('Already rated this insructor')
+        return 'Already rated this insructor', 403
+    data = request.get_json()
+    rating = Rating(userid=current_user.id, instructorid=instid, rating1=data["rating1"], rating2=data["rating2"], rating3=data["rating3"], rating4=data["rating4"], rating5=data["rating5"], rating6=data["rating6"], rating7=data["rating7"], rating8=data["rating8"], rating9=data["rating9"], rating10=data["rating10"], rating11=data["rating11"])
+    db.session.add(rating)
+    db.session.commit()
+    flash ('Instructor rated')
+    return "Instructor rated", 201
+
+@app.route('/myratings/<instid>', methods=['GET'])
+@login_required
+def get_instructor_rating(instid):
+    inst = Instructor.query.get(instid)
+    if inst == None:
+        return 'Invalid instructor id or unauthorized', 403
+    rating = Rating.query.get((current_user.id, instid))
+    print(rating)
+    if rating == None:
+        return 'This instructor has no rating or is unauthorized', 403
+    inst = inst.toDict()
+    rating = rating.toDict()
+    return json.dumps(rating)
+
+@app.route('/ratings/<instid>', methods=['GET'])
+def get_instructor_avg_rating(instid):
+    inst = Instructor.query.get(instid)
+    if inst == None:
+        return 'Invalid instructor id or unauthorized', 403
+    inst = inst.toDict()
+    if current_user.is_authenticated:
+        myRating = Rating.query.get((current_user.id, instid))
+        if myRating != None:
+            myRating = myRating.toDict()
+
+        fav = Favorite.query.get((current_user.id, instid))
+        if fav != None:
+            fav = True
+        else:
+            fav = False
+    else:
+        myRating = None
+        fav = None
+
+    ratings = Rating.query.filter_by(instructorid=instid).all()
+
+    if len(ratings) == 0:
+        rating = None
+        return render_template('ratings.html', inst = inst, rating = rating, myRating=myRating, fav=fav)
+
+    avgRatings = {
+        "rating1" : 0.0,
+        "rating2" : 0.0,
+        "rating3" : 0.0,
+        "rating4" : 0.0,
+        "rating5" : 0.0,
+        "rating6" : 0.0,
+        "rating7" : 0.0,
+        "rating8" : 0.0,
+        "rating9" : 0.0,
+        "rating10" : 0.0,
+        "rating11" : 0.0
+    }
+    
+    for rating in ratings:
+        rating = rating.toDict()
+        avgRatings["rating1"] += rating["rating1"]
+        avgRatings["rating2"] += rating["rating2"]
+        avgRatings["rating3"] += rating["rating3"] 
+        avgRatings["rating4"] += rating["rating4"]
+        avgRatings["rating5"] += rating["rating5"]
+        avgRatings["rating6"] += rating["rating6"]
+        avgRatings["rating7"] += rating["rating7"]
+        avgRatings["rating8"] += rating["rating8"]
+        avgRatings["rating9"] += rating["rating9"]
+        avgRatings["rating10"] += rating["rating10"]
+        avgRatings["rating11"] += rating["rating11"]
+
+    count = len(ratings)
+    
+    avgRatings["rating1"] = avgRatings["rating1"]/count
+    avgRatings["rating2"] = avgRatings["rating2"]/count
+    avgRatings["rating3"] = avgRatings["rating3"]/count
+    avgRatings["rating4"] = avgRatings["rating4"]/count
+    avgRatings["rating5"] = avgRatings["rating5"]/count
+    avgRatings["rating6"] = avgRatings["rating6"]/count
+    avgRatings["rating7"] = avgRatings["rating7"]/count
+    avgRatings["rating8"] = avgRatings["rating8"]/count
+    avgRatings["rating9"] = avgRatings["rating9"]/count
+    avgRatings["rating10"] = avgRatings["rating10"]/count
+    avgRatings["rating11"] = avgRatings["rating11"]/count
+        
+    return render_template('ratings.html', inst = inst, rating = avgRatings, myRating = myRating, fav=fav)
+
+@app.route('/myratings/<instid>', methods=['PUT'])
+@login_required
+def edit_lecturer_rating(instid):
+    rating = Rating.query.get((current_user.id, instid))
+    if rating == None:
+        flash('This instructor has no rating or is unauthorized')
+        return 'This instructor has no rating or is unauthorized', 401
+    data = request.get_json()
+    if (data['section']=="teaching"):
+        rating.rating1 = data['rating1']
+        rating.rating2 = data['rating2']
+        rating.rating3 = data['rating3']
+        rating.rating4 = data['rating4']
+        rating.rating5 = data['rating5']
+        rating.rating6 = data['rating6']
+        db.session.add(rating)
+        db.session.commit()
+        flash('Insructor teaching style updated')
+        return "Insructor teaching style updated", 201
+    if (data['section']=="personality"):
+        rating.rating7 = data['rating7']
+        rating.rating8 = data['rating8']
+        rating.rating9 = data['rating9']
+        rating.rating10 = data['rating10']
+        rating.rating11 = data['rating11']
+        db.session.add(rating)
+        db.session.commit()
+        flash('Insructor personality updated')
+        return "Insructor personality updated", 201
+    flash('Invalid request')
+    return "Invalid request", 400
+
+@app.route('/myratings/<instid>', methods=['DELETE'])
+@login_required
+def remove_lecturer_rating(instid):
+    rating = Rating.query.get((current_user.id, instid))
+    if rating == None:
+        return 'This instructor has no rating or is unauthorized', 403
+    db.session.delete(rating)
+    db.session.commit()
+    return "Instructor deleted", 201
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
