@@ -53,5 +53,12 @@ def authentication():
         flash('Invalid username or password') # send message to next page
         return "Invalid username or password", 403
 
+@app.route('/logout')
+@login_required
+def logout():
+  logout_user()
+  flash('Logged out successfully.')
+  return redirect('/')
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=8080, debug=True)
