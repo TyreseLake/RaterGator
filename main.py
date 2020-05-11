@@ -36,6 +36,9 @@ def index():
 
 @app.route('/login')
 def login():
+    if current_user.is_authenticated:
+        flash("Logged in successfully.")
+        return render_template('index.html')
     signup = request.args.get('signup')
     if signup is not None:
         return render_template('login.html', signup = True)
@@ -45,7 +48,7 @@ def login():
 def authentication():
     data = request.get_json()
     user = User.query.filter_by(username = data['username']).first()
-    if user and user.check_password(data['password']): # check credentials
+    if (user and user.check_password(data['password']) or (current_user.is_authenticated)): # check credentials
         flash('Logged in successfully.') # send message to next page
         login_user(user) # login the user
         return "Logged in successfully", 200 # redirect to main page if login successful
@@ -91,12 +94,15 @@ def get_inst():
         favs = None
     return render_template("instructors.html", instructors = instructors, favorites = favs)
 
+'''
+#Get Favorites - used for debugging
 @app.route('/favorites', methods=['GET'])
 @login_required
 def get_favorites():
     favs = Favorite.query.filter_by(userid=current_user.id).all()
     favs = [fav.toDict() for fav in favs]
     return json.dumps(favs)
+'''
 
 @app.route('/favorites/<instid>', methods=['POST'])
 @login_required
@@ -265,6 +271,7 @@ def remove_lecturer_rating(instid):
         return 'This instructor has no rating or is unauthorized', 403
     db.session.delete(rating)
     db.session.commit()
+    flash('Instructor rating removed')
     return "Instructor deleted", 201
 
 if __name__ == '__main__':

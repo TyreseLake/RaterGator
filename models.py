@@ -14,15 +14,15 @@ class User(UserMixin, db.Model):
     rating = db.relationship('Rating', backref='user', lazy=True)
 
     def toDict(self):
-      return {
-        "id": self.id,
-        "username": self.username,
-        "email": self.email,
-        "password":self.password,
-        "fname":self.fname,
-        "lname":self.lname
-      }
-    
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "password":self.password,
+            "fname":self.fname,
+            "lname":self.lname
+        }
+        
     #hashes the password parameter and stores it in the object
     def set_password(self, password):
         """Create hashed password."""
