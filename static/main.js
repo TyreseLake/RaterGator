@@ -1,4 +1,4 @@
-const server = "http://localhost:8080";
+const server = "https://safe-shore-44211.herokuapp.com";
 
 async function login(event){
   event.preventDefault();
