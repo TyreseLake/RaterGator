@@ -3,7 +3,6 @@ from flask_cors import CORS
 from flask import Flask, request, render_template, flash, redirect, url_for
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from sqlalchemy.exc import IntegrityError
-from flask_mysqldb import MySQL
 
 from models import db, User, Instructor, Favorite, Rating
 
