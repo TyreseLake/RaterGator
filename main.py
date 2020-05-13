@@ -274,5 +274,9 @@ def remove_lecturer_rating(instid):
     flash('Instructor rating removed')
     return "Instructor deleted", 201
 
+@app.route('/about')
+def aboutus():
+    return render_template('aboutus.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
