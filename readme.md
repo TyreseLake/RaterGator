@@ -1,5 +1,5 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)]
-(https://gitpod.io/#https://github.com/FadedHearts/info2602ps.git) 
+(https://gitpod.io/#https://github.com/FadedHearts/RaterGator.git) 
 
 
 # About Rater gator
