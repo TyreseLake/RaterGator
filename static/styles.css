@@ -311,13 +311,12 @@ input[type=submit] {
 }
 
 .aboutUsContainer{
-    padding: 10px;
+    margin: 10px 20px;
 }
 
 .aboutUsContainer h1{
     font-family: Chilanka;
     color:#00c853;
-    font-size: 25pt;
 }
 
 .aboutUsContainer p{
