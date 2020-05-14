@@ -309,3 +309,15 @@ input[type=submit] {
   font-size: 20pt;
   margin-top: 30px;
 }
+
+.aboutUsContainer h1{
+    font-family: Chilanka;
+    color:#00c853;
+    font-size: 25pt;
+}
+
+.aboutUsContainer p{
+    position: relative;
+    font-size: 12pt;
+    line-height: 0.95;
+}
