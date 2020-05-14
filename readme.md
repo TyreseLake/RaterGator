@@ -75,5 +75,6 @@ git push -u origin master
 
 Heroku is setup to auto deploy the application for every push to the master branch the github repo. You can view the application by opening it from your [heroku dashboard](https://dashboard.heroku.com/apps/). Click on the newly created app then click on the "Open App" button.
 
-You application should now be deployed on heroku!
+References:
 
+Mendez, N., 2020. Snickdx/Info2602ps. [online] GitHub. Available at: <https://github.com/Snickdx/info2602ps> [Accessed 14 May 2020].
