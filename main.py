@@ -147,6 +147,7 @@ def add_instructor_rating(instid):
     flash ('Instructor rated')
     return "Instructor rated", 201
 
+'''
 @app.route('/myratings/<instid>', methods=['GET'])
 @login_required
 def get_instructor_rating(instid):
@@ -160,6 +161,7 @@ def get_instructor_rating(instid):
     inst = inst.toDict()
     rating = rating.toDict()
     return json.dumps(rating)
+'''
 
 @app.route('/ratings/<instid>', methods=['GET'])
 def get_instructor_avg_rating(instid):
