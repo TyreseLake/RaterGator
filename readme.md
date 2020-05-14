@@ -2,7 +2,7 @@
 (https://gitpod.io/#https://github.com/FadedHearts/info2602ps.git) 
 
 
-About Rater gator:
+# About Rater gator
 This site is aimed at collating effective feedback from students of UWI. It allows a user to rate a teacher only once and remove their rating when they think the performance of the teacher has changed. This makes it an effective tool in creating accurate visuals to represent the teaching style and personality of an educator. 
 The information collected has the potential to improve the current teaching method and allow instructors to determine how they can make themselves more effective. We are dedicated to this ideology and hence implemented the use of infographics in a colorful manner pleasing to the eyes. 
 Rater Gator is built for UWI students interested in a fair and comprehensive evaluation of lecturers. This site does what students have been doing forever- checking with others to figure out who are great professors and the ones you may prefer to avoid. 
