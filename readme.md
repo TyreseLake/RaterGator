@@ -1,6 +1,11 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)]
-(https://gitpod.io/#https://github.com/FadedHearts/info2602ps.git) 
+(https://gitpod.io/#https://github.com/FadedHearts/RaterGator.git) 
 
+
+# About Rater gator
+This site is aimed at collating effective feedback from students of UWI. It allows a user to rate a teacher only once and remove their rating when they think the performance of the teacher has changed. This makes it an effective tool in creating accurate visuals to represent the teaching style and personality of an educator. 
+The information collected has the potential to improve the current teaching method and allow instructors to determine how they can make themselves more effective. We are dedicated to this ideology and hence implemented the use of infographics in a colorful manner pleasing to the eyes. 
+Rater Gator is built for UWI students interested in a fair and comprehensive evaluation of lecturers. This site does what students have been doing forever- checking with others to figure out who are great professors and the ones you may prefer to avoid. 
 # Before you start
 Create a heroku account by following this [link](https://signup.heroku.com/login)
 You will also need a github account.
@@ -70,5 +75,6 @@ git push -u origin master
 
 Heroku is setup to auto deploy the application for every push to the master branch the github repo. You can view the application by opening it from your [heroku dashboard](https://dashboard.heroku.com/apps/). Click on the newly created app then click on the "Open App" button.
 
-You application should now be deployed on heroku!
+References:
 
+Mendez, N., 2020. Snickdx/Info2602ps. [online] GitHub. Available at: <https://github.com/Snickdx/info2602ps> [Accessed 14 May 2020].
