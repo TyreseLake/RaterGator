@@ -310,6 +310,10 @@ input[type=submit] {
   margin-top: 30px;
 }
 
+.aboutUsContainer{
+    padding: 10px;
+}
+
 .aboutUsContainer h1{
     font-family: Chilanka;
     color:#00c853;
